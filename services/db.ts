@@ -1,6 +1,7 @@
 
 import { User, UserRole, Incident, IncidentStatus, StatusUpdate } from '../types';
 import { supabase } from './supabase';
+import { emailService } from './email';
 
 export const dbService = {
   // Get all incidents (for admin)
@@ -68,6 +69,14 @@ export const dbService = {
       throw error;
     }
 
+    // Send email notification to admins
+    try {
+      await emailService.sendCrimeReportAlert(data);
+    } catch (emailError) {
+      console.error('Email notification failed but incident was created:', emailError);
+      // Don't throw - the incident was successfully created
+    }
+
     return data;
   },
 
@@ -78,7 +87,7 @@ export const dbService = {
     // Get current incident
     const { data: currentIncident, error: fetchError } = await supabase
       .from('incidents')
-      .select('status, status_history')
+      .select('*')
       .eq('id', id)
       .single();
 
@@ -109,6 +118,13 @@ export const dbService = {
 
       if (updateError) {
         console.error('Error updating incident status:', updateError);
+      } else {
+        // Send status update email to reporter
+        try {
+          await emailService.sendStatusUpdateEmail(currentIncident, status);
+        } catch (emailError) {
+          console.error('Failed to send status update email:', emailError);
+        }
       }
     }
   },
