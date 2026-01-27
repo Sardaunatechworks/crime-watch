@@ -1,0 +1,6 @@
+
+{
+  "name": "Crime-Watch",
+  "description": "A high-security community incident reporting platform with real-time status tracking and role-based access control for reporters and administrators.",
+  "requestFramePermissions": []
+}
