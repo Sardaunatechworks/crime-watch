@@ -1,7 +1,7 @@
-
-import { User, UserRole, Incident, IncidentStatus, StatusUpdate } from '../types';
+import { User, UserRole, Incident, IncidentStatus } from '../types';
 import { supabase } from './supabase';
-import { emailService } from './email';
+
+// Note: emailService import removed to fix the "requested module does not provide an export" error.
 
 export const dbService = {
   // Get all incidents (for admin)
@@ -69,13 +69,8 @@ export const dbService = {
       throw error;
     }
 
-    // Send email notification to admins
-    try {
-      await emailService.sendCrimeReportAlert(data);
-    } catch (emailError) {
-      console.error('Email notification failed but incident was created:', emailError);
-      // Don't throw - the incident was successfully created
-    }
+    // Email notification logic has been moved to the UI component (IncidentForm.tsx) 
+    // to support browser-compatible EmailJS.
 
     return data;
   },
@@ -118,14 +113,9 @@ export const dbService = {
 
       if (updateError) {
         console.error('Error updating incident status:', updateError);
-      } else {
-        // Send status update email to reporter
-        try {
-          await emailService.sendStatusUpdateEmail(currentIncident, status);
-        } catch (emailError) {
-          console.error('Failed to send status update email:', emailError);
-        }
       }
+      // Note: Admin status update emails should be triggered from the Admin Dashboard 
+      // using the same EmailJS logic if required.
     }
   },
 
@@ -149,18 +139,12 @@ export const dbService = {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'incidents' },
-        (payload) => {
-          // When any change occurs, fetch fresh data
+        () => {
           dbService.getIncidents().then(callback);
         }
       )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('Subscribed to incidents');
-        }
-      });
+      .subscribe();
 
-    // Return unsubscribe function
     return () => {
       supabase.removeChannel(channel);
     };
@@ -173,16 +157,11 @@ export const dbService = {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'incidents' },
-        (payload) => {
-          // When any change occurs, fetch fresh data for this user
+        () => {
           dbService.getUserIncidents(userId).then(callback);
         }
       )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('Subscribed to user incidents');
-        }
-      });
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -192,7 +171,6 @@ export const dbService = {
 
 export const authService = {
   login: async (email: string): Promise<User> => {
-    // Check if user exists in database
     const { data: existingUser } = await supabase
       .from('users')
       .select('*')
@@ -200,18 +178,15 @@ export const authService = {
       .single();
 
     if (existingUser) {
-      // Update last login
       await supabase
         .from('users')
         .update({ last_login: new Date().toISOString() })
         .eq('id', existingUser.id);
 
-      // Save to localStorage for session
       localStorage.setItem('auth_user', JSON.stringify(existingUser));
       return existingUser;
     }
 
-    // Create new user
     const isAdmin = email.toLowerCase() === 'admin@mail.com';
     const newUser: User = {
       id: crypto.randomUUID(),
@@ -230,7 +205,6 @@ export const authService = {
       throw error;
     }
 
-    // Save to localStorage for session
     localStorage.setItem('auth_user', JSON.stringify(createdUser));
     return createdUser;
   },

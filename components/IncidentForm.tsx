@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import emailjs from "@emailjs/browser";
 import { CATEGORIES, COMMON_LOCATIONS, Icons } from "../constants";
 
 interface IncidentFormProps {
@@ -18,8 +19,33 @@ const IncidentForm: React.FC<IncidentFormProps> = ({ onSubmit, onCancel }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await onSubmit(formData);
-    setLoading(false);
+
+    try {
+      // 1. Submit to your main database first
+      await onSubmit(formData);
+
+      // 2. Trigger the EmailJS notification
+      // These variables are pulled from your .env.local file
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          title: formData.title,
+          category: formData.category,
+          location: formData.location,
+          description: formData.description,
+          reported_at: new Date().toLocaleString(),
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+      );
+
+      alert("Incident successfully reported and email notification sent.");
+    } catch (error) {
+      console.error("Transmission error:", error);
+      alert("There was an issue transmitting the report. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLocationSuggestion = (loc: string) => {
