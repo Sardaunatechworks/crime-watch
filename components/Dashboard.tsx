@@ -3,6 +3,7 @@ import { User, UserRole, Incident, IncidentStatus } from "../types";
 import { dbService } from "../services/db";
 import { STATUS_COLORS, Icons } from "../constants";
 import IncidentForm from "./IncidentForm";
+import IncidentImages from "./IncidentImages";
 
 interface DashboardProps {
   user: User;
@@ -147,32 +148,32 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 lg:py-14 space-y-8 md:space-y-12">
       {/* Header Section */}
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-[0.3em] rounded-lg border border-indigo-100/50">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-10">
+        <div className="space-y-3 md:space-y-4">
+          <div className="flex items-center gap-2 md:gap-3">
+            <span className="px-2.5 md:px-3 py-1 md:py-1.5 bg-indigo-50 text-indigo-600 text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] rounded-lg border border-indigo-100/50">
               {isAdmin ? "Admin Control" : "User Portal"}
             </span>
-            <div className="h-px w-12 bg-indigo-200"></div>
+            <div className="h-px w-8 md:w-12 bg-indigo-200"></div>
           </div>
-          <h1 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight leading-none">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
             {isAdmin ? "Command Center" : "My Incidents"}
           </h1>
-          <p className="text-slate-500 font-medium text-lg max-w-2xl leading-relaxed">
+          <p className="text-slate-500 font-medium text-sm md:text-base lg:text-lg max-w-2xl leading-relaxed">
             {isAdmin
               ? "Oversee and orchestrate community safety responses with unified case management."
               : "Track investigative milestones for your filed reports in real-time."}
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-          <div className="relative min-w-[320px]">
-            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400">
+        <div className="flex flex-col gap-3 md:gap-4">
+          <div className="relative w-full md:min-w-[320px]">
+            <div className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 text-slate-400">
               <svg
-                width="20"
-                height="20"
+                width="18"
+                height="18"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -184,8 +185,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             </div>
             <input
               type="text"
-              placeholder="Search by case, reporter or location..."
-              className="w-full pl-14 pr-6 py-4 rounded-2xl bg-white border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 outline-none transition-all font-bold text-slate-800 shadow-sm hover:border-slate-300"
+              placeholder="Search cases, reporters, locations..."
+              className="w-full pl-10 md:pl-14 pr-4 md:pr-6 py-3 md:py-4 rounded-xl md:rounded-2xl bg-white border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 outline-none transition-all font-bold text-sm md:text-base text-slate-800 shadow-sm hover:border-slate-300"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -194,10 +195,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           {!isAdmin && !showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="group flex items-center justify-center gap-3 bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-slate-200 transition-all active:scale-[0.98] uppercase text-[11px] tracking-widest"
+              className="group flex items-center justify-center gap-2 md:gap-3 bg-slate-900 hover:bg-black active:scale-95 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-black shadow-lg md:shadow-xl md:shadow-slate-200 transition-all uppercase text-[9px] md:text-[11px] tracking-widest"
             >
               <Icons.Plus />
-              File New Report
+              <span>File New Report</span>
             </button>
           )}
         </div>
@@ -205,7 +206,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
       {/* Admin Performance Overview Grid */}
       {isAdmin && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
           {[
             {
               label: "Total Cases",
@@ -234,19 +235,19 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm group hover:shadow-md transition-all"
+              className="bg-white p-4 md:p-6 rounded-xl md:rounded-3xl border border-slate-100 shadow-sm group hover:shadow-md transition-all"
             >
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              <div className="flex justify-between items-start mb-3 md:mb-4">
+                <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">
                   {stat.label}
                 </span>
                 <div
-                  className={`p-2 rounded-xl bg-${stat.color}-50 text-${stat.color}-600`}
+                  className={`p-2 rounded-lg md:rounded-xl bg-${stat.color}-50 text-${stat.color}-600`}
                 >
                   <Icons.Shield />
                 </div>
               </div>
-              <div className="text-4xl font-black text-slate-900">
+              <div className="text-2xl md:text-4xl font-black text-slate-900">
                 {stat.value}
               </div>
             </div>
@@ -255,22 +256,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       )}
 
       {/* Unified Filter Bar */}
-      <div className="flex flex-wrap items-center gap-3 bg-slate-100/50 p-2 rounded-2xl border border-slate-200/50">
+      <div className="flex flex-wrap items-center gap-2 md:gap-3 bg-slate-100/50 p-2 md:p-3 rounded-xl md:rounded-2xl border border-slate-200/50">
         <button
           onClick={() => setFilter("ALL")}
-          className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+          className={`px-3 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-black uppercase tracking-widest transition-all ${
             filter === "ALL"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-500 hover:text-slate-700"
           }`}
         >
-          All Units ({stats.all})
+          All ({stats.all})
         </button>
         {Object.values(IncidentStatus).map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`px-3 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-black uppercase tracking-widest transition-all ${
               filter === s
                 ? "bg-white text-slate-900 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"
@@ -291,27 +292,27 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       )}
 
       {/* Incident Grid */}
-      <div className="grid gap-8">
+      <div className="grid gap-4 md:gap-6 lg:gap-8">
         {filteredIncidents.length === 0 ? (
-          <div className="py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 text-center space-y-4">
+          <div className="py-16 md:py-24 bg-white rounded-2xl md:rounded-[3rem] border-2 border-dashed border-slate-200 text-center space-y-3 md:space-y-4">
             <div className="flex justify-center text-slate-100">
-              <div className="scale-[3]">
+              <div className="scale-[2.5] md:scale-[3]">
                 <Icons.Shield />
               </div>
             </div>
-            <p className="text-slate-400 font-bold uppercase text-[11px] tracking-[0.3em]">
-              No incident records match your current criteria
+            <p className="text-slate-400 font-bold uppercase text-[10px] md:text-[11px] tracking-[0.3em]">
+              No incident records match your criteria
             </p>
           </div>
         ) : (
           filteredIncidents.map((incident) => (
             <div
               key={incident.id}
-              className="group relative bg-white rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-2xl hover:shadow-indigo-500/5 hover:border-indigo-100 transition-all duration-500 overflow-hidden"
+              className="group relative bg-white rounded-xl md:rounded-2xl lg:rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-lg md:hover:shadow-2xl hover:shadow-indigo-500/5 hover:border-indigo-100 transition-all duration-500 overflow-hidden"
             >
               {/* Dynamic Status Strip */}
               <div
-                className={`absolute top-0 left-0 bottom-0 w-2 ${
+                className={`absolute top-0 left-0 bottom-0 w-1 md:w-2 ${
                   incident.status === IncidentStatus.RESOLVED
                     ? "bg-emerald-500"
                     : incident.status === IncidentStatus.PENDING
@@ -320,36 +321,36 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                 } opacity-80`}
               ></div>
 
-              <div className="p-8 lg:p-12 pl-10 lg:pl-16">
+              <div className="p-4 md:p-8 lg:p-12 pl-5 md:pl-10 lg:pl-16">
                 {/* Header Row */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-8">
-                  <div className="space-y-3 flex-grow">
-                    <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 md:gap-6 lg:gap-8 mb-6 md:mb-8">
+                  <div className="space-y-2 md:space-y-3 flex-grow">
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3">
                       <span
-                        className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${STATUS_COLORS[incident.status]}`}
+                        className={`px-2.5 md:px-4 py-1 md:py-1.5 rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest border ${STATUS_COLORS[incident.status]}`}
                       >
                         {incident.status.replace("_", " ")}
                       </span>
-                      <span className="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 border border-slate-100">
+                      <span className="px-2.5 md:px-4 py-1 md:py-1.5 rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 border border-slate-100">
                         {incident.category}
                       </span>
-                      <span className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                      <span className="flex items-center gap-1 text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-wider">
                         <Icons.MapPin /> {incident.location}
                       </span>
                     </div>
-                    <h3 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight leading-tight group-hover:text-indigo-600 transition-colors">
+                    <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight leading-tight group-hover:text-indigo-600 transition-colors">
                       {incident.title}
                     </h3>
                   </div>
 
-                  <div className="flex flex-col lg:items-end gap-2 text-right">
-                    <div className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">
+                  <div className="flex flex-col lg:items-end gap-1 md:gap-2 text-right flex-shrink-0">
+                    <div className="text-[8px] md:text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">
                       Ref: #{incident.id.slice(0, 8).toUpperCase()}
                     </div>
-                    <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                    <div className="flex items-center gap-2 text-slate-400 text-[8px] md:text-[10px] font-bold uppercase tracking-wider">
                       <svg
-                        width="12"
-                        height="12"
+                        width="10"
+                        height="10"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -364,25 +365,35 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                 </div>
 
                 {/* Content Area */}
-                <div className="grid lg:grid-cols-3 gap-12 items-start pt-8 border-t border-slate-50">
+                <div className="grid lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12 items-start pt-6 md:pt-8 border-t border-slate-50">
                   {/* Left: Narrative */}
-                  <div className="lg:col-span-2 space-y-6">
-                    <div className="text-slate-600 text-lg leading-relaxed font-medium italic">
+                  <div className="lg:col-span-2 space-y-4 md:space-y-6">
+                    <div className="text-slate-600 text-base md:text-lg leading-relaxed font-medium italic">
                       "{incident.description}"
                     </div>
+
+                    {/* Evidence Gallery - Admin Only */}
+                    {isAdmin && (
+                      <div className="p-4 md:p-6 bg-slate-50 rounded-xl md:rounded-3xl border border-slate-100/50">
+                        <IncidentImages
+                          incidentId={incident.id}
+                          isAdmin={isAdmin}
+                        />
+                      </div>
+                    )}
 
                     {/* Activity Timeline Mini */}
                     {incident.status_history &&
                       incident.status_history.length > 0 && (
-                        <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100/50">
-                          <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">
-                            Investigation Timeline
+                        <div className="p-4 md:p-6 bg-slate-50 rounded-xl md:rounded-3xl border border-slate-100/50">
+                          <h4 className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 md:mb-4">
+                            Timeline
                           </h4>
-                          <div className="flex flex-wrap gap-4">
+                          <div className="flex flex-wrap gap-3 md:gap-4">
                             {incident.status_history.map((h, idx) => (
                               <div
                                 key={idx}
-                                className="flex items-center gap-3"
+                                className="flex items-center gap-2 md:gap-3"
                               >
                                 <div
                                   className={`h-2 w-2 rounded-full ${
@@ -392,10 +403,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                                   }`}
                                 ></div>
                                 <div className="flex flex-col">
-                                  <span className="text-[10px] font-black text-slate-800 uppercase">
+                                  <span className="text-[8px] md:text-[10px] font-black text-slate-800 uppercase">
                                     {h.status.split("_")[0]}
                                   </span>
-                                  <span className="text-[8px] font-bold text-slate-400">
+                                  <span className="text-[7px] md:text-[8px] font-bold text-slate-400">
                                     {new Date(
                                       h.changed_at,
                                     ).toLocaleDateString()}
@@ -409,22 +420,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                   </div>
 
                   {/* Right: Meta & Actions */}
-                  <div className="space-y-8">
+                  <div className="space-y-4 md:space-y-6 lg:space-y-8">
                     {isAdmin && incident.reporter_email && (
-                      <div className="p-6 bg-indigo-50/50 rounded-3xl border border-indigo-100/50">
-                        <div className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-3">
-                          Identity Proof
+                      <div className="p-4 md:p-6 bg-indigo-50/50 rounded-xl md:rounded-3xl border border-indigo-100/50">
+                        <div className="text-[8px] md:text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-2 md:mb-3">
+                          Identity
                         </div>
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black shadow-lg shadow-indigo-100">
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className="h-8 md:h-10 w-8 md:w-10 rounded-lg md:rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black shadow-lg shadow-indigo-100 text-xs md:text-sm flex-shrink-0">
                             {incident.reporter_email[0].toUpperCase()}
                           </div>
-                          <div className="flex flex-col overflow-hidden">
-                            <span className="text-sm font-black text-slate-900 truncate">
+                          <div className="flex flex-col overflow-hidden min-w-0">
+                            <span className="text-xs md:text-sm font-black text-slate-900 truncate">
                               {incident.reporter_email}
                             </span>
-                            <span className="text-[9px] font-bold text-slate-400 uppercase">
-                              Verified Account
+                            <span className="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase">
+                              Verified
                             </span>
                           </div>
                         </div>
@@ -432,49 +443,47 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                     )}
 
                     {isAdmin ? (
-                      <div className="space-y-4">
-                        <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                          Administrative Action
+                      <div className="space-y-3 md:space-y-4">
+                        <div className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                          Action
                         </div>
-                        <div className="grid grid-cols-1 gap-2">
+                        <div className="grid grid-cols-1 gap-2 md:gap-2">
                           {Object.values(IncidentStatus).map((s) => (
                             <button
                               key={s}
                               onClick={() => handleUpdateStatus(incident.id, s)}
-                              className={`w-full py-3.5 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                              className={`w-full py-2.5 md:py-3.5 px-4 md:px-6 rounded-lg md:rounded-2xl text-[8px] md:text-[10px] font-black uppercase tracking-widest transition-all ${
                                 incident.status === s
                                   ? "bg-slate-900 text-white shadow-lg"
                                   : "bg-white text-slate-500 border border-slate-200 hover:border-indigo-300 hover:text-indigo-600"
                               }`}
                             >
-                              Transition to {s.split("_")[0]}
+                              {s.split("_")[0]}
                             </button>
                           ))}
                         </div>
                         <button
                           onClick={() => handleDelete(incident.id)}
-                          className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-400 bg-red-50/50 border border-red-100/50 hover:bg-red-50 hover:text-red-600 transition-all"
+                          className="w-full flex items-center justify-center gap-2 py-2.5 md:py-3.5 px-4 md:px-6 rounded-lg md:rounded-2xl text-[8px] md:text-[10px] font-black uppercase tracking-widest text-red-400 bg-red-50/50 border border-red-100/50 hover:bg-red-50 hover:text-red-600 transition-all"
                         >
-                          <Icons.Trash /> Purge Case Record
+                          <Icons.Trash /> Delete
                         </button>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                          Current Status
+                      <div className="space-y-3 md:space-y-4">
+                        <div className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                          Status
                         </div>
                         <div
-                          className={`p-6 rounded-3xl border ${STATUS_COLORS[incident.status]} flex items-center gap-4`}
+                          className={`p-4 md:p-6 rounded-xl md:rounded-3xl border ${STATUS_COLORS[incident.status]} flex items-center gap-3 md:gap-4`}
                         >
-                          <div className="animate-pulse h-2 w-2 rounded-full bg-current"></div>
-                          <span className="font-black text-sm uppercase tracking-tight">
+                          <div className="animate-pulse h-2 w-2 rounded-full bg-current flex-shrink-0"></div>
+                          <span className="font-black text-xs md:text-sm uppercase tracking-tight">
                             {incident.status.replace("_", " ")}
                           </span>
                         </div>
-                        <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
-                          Your report is active within our secure investigation
-                          queue. Updates will appear here as the case
-                          progresses.
+                        <p className="text-[9px] md:text-[10px] text-slate-400 font-medium leading-relaxed">
+                          Your report is active within our investigation queue.
                         </p>
                       </div>
                     )}

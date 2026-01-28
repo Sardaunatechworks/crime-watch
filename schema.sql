@@ -25,32 +25,37 @@ CREATE TABLE incidents (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Row Level Security (RLS)
+-- 4. Incident Images Table
+CREATE TABLE incident_images (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  incident_id UUID NOT NULL REFERENCES incidents(id) ON DELETE CASCADE,
+  file_path TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  file_size INT NOT NULL,
+  mime_type TEXT NOT NULL,
+  uploaded_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT file_path_unique UNIQUE(incident_id, file_path)
+);
+
+-- 5. Row Level Security (RLS)
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE incidents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE incident_images ENABLE ROW LEVEL SECURITY;
 
 -- Profiles Policies
-CREATE POLICY "Users can view their own profile" ON profiles 
-  FOR SELECT USING (auth.uid() = id);
+-- Note: Using custom authentication system (users table), not Supabase Auth
+CREATE POLICY "Allow all operations on profiles" ON profiles
+  FOR ALL USING (true) WITH CHECK (true);
+
+-- Incident Images Policies
+-- Note: Using custom authentication system (users table), not Supabase Auth
+CREATE POLICY "Allow all operations on incident images" ON incident_images
+  FOR ALL USING (true) WITH CHECK (true);
 
 -- Incident Policies
-CREATE POLICY "Reporters can view their own incidents" ON incidents
-  FOR SELECT USING (auth.uid() = reporter_id);
+-- Note: Using custom authentication system (users table), not Supabase Auth
+-- RLS is disabled for incidents table as authorization is handled at application level
 
-CREATE POLICY "Reporters can insert their own incidents" ON incidents
-  FOR INSERT WITH CHECK (auth.uid() = reporter_id);
-
-CREATE POLICY "Admins can view all incidents" ON incidents
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-  );
-
-CREATE POLICY "Admins can update incidents" ON incidents
-  FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-  );
-
-CREATE POLICY "Admins can delete incidents" ON incidents
-  FOR DELETE USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-  );
+-- Allow all operations (RLS disabled for this table)
+CREATE POLICY "Allow all operations on incidents" ON incidents
+  FOR ALL USING (true) WITH CHECK (true);

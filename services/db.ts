@@ -1,55 +1,78 @@
 import { User, UserRole, Incident, IncidentStatus } from '../types';
 import { supabase } from './supabase';
+import { imageService } from './imageService';
 
 // Note: emailService import removed to fix the "requested module does not provide an export" error.
 
 export const dbService = {
   // Get all incidents (for admin)
   getIncidents: async (): Promise<Incident[]> => {
-    const { data, error } = await supabase
-      .from('incidents')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('incidents')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching incidents:', error);
+      if (error) {
+        console.error('Error fetching incidents:', {
+          message: error.message,
+          code: error.code,
+          details: error.details
+        });
+        return [];
+      }
+
+      return (data || []).map(incident => ({
+        ...incident,
+        status_history: incident.status_history || []
+      }));
+    } catch (err) {
+      console.error('Unexpected error fetching incidents:', err);
       return [];
     }
-
-    return (data || []).map(incident => ({
-      ...incident,
-      status_history: incident.status_history || []
-    }));
   },
 
   // Get user's incidents
   getUserIncidents: async (userId: string): Promise<Incident[]> => {
-    const { data, error } = await supabase
-      .from('incidents')
-      .select('*')
-      .eq('reporter_id', userId)
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('incidents')
+        .select('*')
+        .eq('reporter_id', userId)
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching user incidents:', error);
+      if (error) {
+        console.error('Error fetching user incidents:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          userId
+        });
+        return [];
+      }
+
+      return (data || []).map(incident => ({
+        ...incident,
+        status_history: incident.status_history || []
+      }));
+    } catch (err) {
+      console.error('Unexpected error fetching user incidents:', err);
       return [];
     }
-
-    return (data || []).map(incident => ({
-      ...incident,
-      status_history: incident.status_history || []
-    }));
   },
 
   // Create new incident
   addIncident: async (
-    incidentData: Omit<Incident, 'id' | 'status' | 'created_at' | 'last_updated_at' | 'status_history'>
+    incidentData: Omit<Incident, 'id' | 'status' | 'created_at' | 'last_updated_at' | 'status_history'> & { images?: Array<{ file: File; preview: string; id: string }> }
   ): Promise<Incident> => {
     const now = new Date().toISOString();
     const initialStatus = IncidentStatus.PENDING;
 
+    // Separate images from incident data
+    const { images, ...incident } = incidentData;
+
     const incidentToInsert = {
-      ...incidentData,
+      ...incident,
       status: initialStatus,
       created_at: now,
       last_updated_at: now,
@@ -67,6 +90,19 @@ export const dbService = {
     if (error) {
       console.error('Error adding incident:', error);
       throw error;
+    }
+
+    // Upload images if provided
+    if (images && images.length > 0 && data.reporter_id) {
+      try {
+        for (const image of images) {
+          await imageService.uploadAndSaveImage(data.id, image.file, data.reporter_id);
+        }
+      } catch (imageError) {
+        console.error('Error uploading images:', imageError);
+        // Don't fail the entire incident creation if images fail
+        // The incident is already created; images are secondary
+      }
     }
 
     // Email notification logic has been moved to the UI component (IncidentForm.tsx) 
